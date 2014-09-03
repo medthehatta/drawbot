@@ -1,0 +1,71 @@
+'draw the arm
+Sub drawArm(ByVal Rot As Double)
+    
+    Rot = Rot
+    
+    'scale arm
+    Dim armSize As Double: armSize = Sim.armSize * 72 * Sim.drawScale
+    
+    'calcualte the pivot of the arm:
+    Dim AX As Long: AX = Sim.drawHCenter
+    Dim AY As Long: AY = Sim.drawVCenter + armSize
+    
+    'calculate the tip of arm (where the sharpie should be)
+    Dim TX As Long: TX = AX - Sin(Rot * (3.14159 / 180) - 3.14159) * armSize
+    Dim TY As Long: TY = AY + Cos(Rot * (3.14159 / 180) - 3.14159) * armSize
+    
+    'draw a line representing the arm
+    frmMain.DrawWidth = 3
+    frmMain.ForeColor = vbRed
+    'frmMain.Line (AX, AY)-(TX, TY)
+    
+    'draw the arm!
+    frmMain.DrawWidth = 1
+    
+    lineDrawer.setPivot AX, AY
+    
+    'left side
+    
+    Dim baseRadious As Double: baseRadious = 72 * Sim.drawScale
+    lineDrawer.setPoint Rot - 180, baseRadious
+    
+    lineDrawer.drawTo Rot - 150, baseRadious
+    lineDrawer.drawTo Rot - 120, baseRadious
+    lineDrawer.drawTo Rot - 90, baseRadious
+    lineDrawer.drawTo Rot + 90, baseRadious
+    lineDrawer.drawTo Rot - 90, baseRadious
+    
+    lineDrawer.drawTo Rot - 3, armSize * 0.95
+    lineDrawer.drawTo Rot - 4, armSize
+    lineDrawer.drawTo Rot - 3, armSize * 1.03
+    lineDrawer.drawTo Rot - 1.5, armSize * 1.04
+    
+    lineDrawer.drawTo Rot - 2.5, armSize
+    lineDrawer.drawTo Rot - 1.8, armSize * 0.97
+    
+    lineDrawer.drawTo Rot + 0, armSize * 0.96
+    
+    lineDrawer.drawTo Rot + 1.8, armSize * 0.97
+    lineDrawer.drawTo Rot + 2.5, armSize
+    
+    lineDrawer.drawTo Rot + 1.5, armSize * 1.04
+    lineDrawer.drawTo Rot + 3, armSize * 1.03
+    lineDrawer.drawTo Rot + 4, armSize
+    lineDrawer.drawTo Rot + 3, armSize * 0.95
+    
+    lineDrawer.drawTo Rot + 90, baseRadious
+    lineDrawer.drawTo Rot + 120, baseRadious
+    lineDrawer.drawTo Rot + 150, baseRadious
+    lineDrawer.drawTo Rot + 180, baseRadious
+    
+    'draw thick line from center
+    frmMain.DrawWidth = 2
+    lineDrawer.setPoint 0, 0
+    lineDrawer.drawTo Rot + 0, armSize * 0.96
+    
+    'draw sharpie dot
+    frmMain.DrawWidth = 4
+    frmMain.ForeColor = vbBlack
+    frmMain.PSet (TX, TY)
+End Sub
+
