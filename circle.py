@@ -55,20 +55,29 @@ def circle(radius, center=[0,0], start=0, end=360, resolution=10):
 
 class Canvas(object):
     
-    def __init__(self):
-        self.SCREEN_WIDTH = 400
-        self.SCREEN_HEIGHT = 400
-        self.BG_COLOR = (255, 255, 255)
+    def __init__(self, rect, scale=1.0, pxres=150):
+        self.rect = rect
+        self.scale = scale
+        self.pxres = pxres
+        self.origin = \
+                np.array([self.rect.get_width(), self.rect.get_height()])/2.
 
-        self.scale = 1.0
-        self.pxres = 72
-        self.origin = np.array([self.SCREEN_WIDTH, self.SCREEN_HEIGHT])/2.
-
-    def canvas_coords(x):
-        return transform(x, 
+    def canvas_coords(self, x):
+        return transform(x*[1,-1], 
                 offset=self.origin, 
-                scale=self.pxres*self.scale,
-                one=1)
+                scale=self.pxres*self.scale)
+
+    def clear_canvas(self):
+        return self.rect.fill([255]*3)
+
+    def draw_lines(self,lines):
+        for lineset in lines:
+            lineset = list(self.canvas_coords(lineset))
+            pygame.draw.aalines(self.rect,
+                [0]*3,
+                False,
+                lineset)
+
 
 
 class MechanismDrawing(object):
@@ -128,13 +137,16 @@ class MechanismDrawing(object):
 
 def run_game():
     # Game parameters
-    SCREEN_WIDTH, SCREEN_HEIGHT = 400, 400
-    BG_COLOR = (255, 255, 255)
+    SCREEN_WIDTH, SCREEN_HEIGHT = 800, 800
 
     pygame.init()
     screen = pygame.display.set_mode(
                 (SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
     clock = pygame.time.Clock()
+
+    # Instantiate a mechanism drawing
+    mechanism = MechanismDrawing()
+    canvas = Canvas(screen, pxres=10)
 
     # The main game loop
     #
@@ -148,19 +160,29 @@ def run_game():
                 exit_game()
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     exit_game()
+                elif event.key == pygame.K_LEFT:
+                    mechanism.arm_angle = (mechanism.arm_angle - 5) % 360
+                elif event.key == pygame.K_RIGHT:
+                    mechanism.arm_angle = (mechanism.arm_angle + 5) % 360
+                elif event.key == pygame.K_UP:
+                    canvas.scale *= 0.9
+                elif event.key == pygame.K_DOWN:
+                    canvas.scale *= 1.1
 
-        # Redraw the background
-        screen.fill(BG_COLOR)
+        # Redraw the mechanism
+        arm_drawing = mechanism.draw_arm()
+        canvas.clear_canvas()
+        canvas.draw_lines(arm_drawing)
 
         pygame.display.flip()
 
 
 def exit_game():
+    pygame.quit()
     sys.exit()
 
 if __name__ == '__main__':
-    pass
-    #run_game()
+    run_game()
 
