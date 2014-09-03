@@ -55,7 +55,7 @@ def circle(radius, center=[0,0], start=0, end=360, resolution=10):
 
 class Canvas(object):
     
-    def __init__(self, rect, scale=1.0, pxres=150):
+    def __init__(self, rect, scale=1.0, pxres=72):
         self.rect = rect
         self.scale = scale
         self.pxres = pxres
@@ -146,7 +146,7 @@ def run_game():
 
     # Instantiate a mechanism drawing
     mechanism = MechanismDrawing()
-    canvas = Canvas(screen, pxres=10)
+    canvas = Canvas(screen)
 
     # The main game loop
     #
