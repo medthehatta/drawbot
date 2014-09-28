@@ -226,9 +226,9 @@ def run_game():
                     pressed = pygame.key.get_pressed()
                     mods = pygame.key.get_mods()
 
-                    diff = 1
-                    if mods & pygame.KMOD_SHIFT: diff *= 10
-                    if mods & pygame.KMOD_CTRL: diff *= 5
+                    diff = 5
+                    if mods & pygame.KMOD_SHIFT: diff = 10
+                    if mods & pygame.KMOD_CTRL: diff = 1
 
                     if pressed[pygame.K_a]:
                         mechanism.arm_angle += diff
@@ -241,9 +241,9 @@ def run_game():
                     pressed = pygame.key.get_pressed()
                     mods = pygame.key.get_mods()
 
-                    diff = 1
-                    if mods & pygame.KMOD_SHIFT: diff *= 10
-                    if mods & pygame.KMOD_CTRL: diff *= 5
+                    diff = 5
+                    if mods & pygame.KMOD_SHIFT: diff = 10
+                    if mods & pygame.KMOD_CTRL: diff = 1
 
                     if pressed[pygame.K_a]:
                         mechanism.arm_angle -= diff
