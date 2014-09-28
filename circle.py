@@ -70,6 +70,12 @@ class Canvas(object):
                 offset=self.origin, 
                 scale=self.pxres*self.scale)
 
+    def world_coords(self, x):
+        x = np.array(x)
+        return transform(x,
+                offset=-self.origin/(self.pxres*self.scale),
+                scale=1/(self.pxres*self.scale))*[1,-1]
+
     def clear_canvas(self):
         return self.rect.fill([255]*3)
 
