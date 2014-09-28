@@ -31,8 +31,10 @@ def rot2d(angle, vectors, about=[0,0]):
     R = np.array([[c, -s],[s, c]])
     return about + np.array([np.dot(R,v) for v in vs])
 
-def transform(vectors, offset=[0,0], angle=0, scale=1.0, one=False):
+def transform(vectors, offset=[0,0], angle=0, scale=1.0):
     vectors = np.array(vectors)
+    one = (len(vectors.shape)==1)
+    if one: vectors = np.array([vectors])
     rotated = scale*rot2d(angle,vectors)
     transformed = offset + rotated
     # If requested, return a single vector
