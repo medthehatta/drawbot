@@ -136,7 +136,7 @@ class MechanismDrawing(object):
         base_radius = 0.15
 
         # offset between center of disc and pivot of arm
-        self.arm_offset = [0, -self.arm_length]
+        arm_offset = [0, -self.arm_length]
 
         # points in the arm body and head
         # (converted to local coords from greg's VB code
@@ -155,6 +155,7 @@ class MechanismDrawing(object):
             [ 0.06975647,  0.99756405],
             [ 0.04971916,  0.94869806],
         ]
+        body_pts = transform(body_pts, offset=arm_offset)
 
         # points that make up a vertical arm
         pts = [ \
@@ -174,7 +175,7 @@ class MechanismDrawing(object):
         
         transformed = [\
             transform(pts, 
-            offset=self.arm_offset,
+            offset=arm_offset,
             angle=world_arm_angle)
             for pts in pts]
 
