@@ -97,7 +97,7 @@ class Canvas(object):
                 False,
                 lineset)
 
-    def scale_to(pos, scale_chg=0.1):
+    def scale_to(self, pos, scale_chg=0.1):
         pos_before = self.world_coords(pos)
         self.scale *= (1 + scale_chg)
         pos_after = self.world_coords(pos)
