@@ -232,10 +232,10 @@ def run_game():
 
                     if pressed[pygame.K_a]:
                         mechanism.arm_angle += diff
-                    elif pressed[pygame.K_d]:
+                    if pressed[pygame.K_d]:
                         mechanism.disc_angle += diff
-                    else:
-                        canvas.scale_to(pos, 0.1)
+                    if True not in pressed:
+                        canvas.scale_to(pos, (diff/50.))
 
                 elif event.button == 5:
                     pressed = pygame.key.get_pressed()
@@ -247,10 +247,10 @@ def run_game():
 
                     if pressed[pygame.K_a]:
                         mechanism.arm_angle -= diff
-                    elif pressed[pygame.K_d]:
+                    if pressed[pygame.K_d]:
                         mechanism.disc_angle -= diff
-                    else:
-                        canvas.scale_to(pos, -0.1)
+                    if True not in pressed:
+                        canvas.scale_to(pos, -(diff/50.))
 
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
