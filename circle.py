@@ -127,6 +127,13 @@ class MechanismDrawing(object):
         self.disc_angle = 0
         self.arm_angle = 0
 
+    def draw_mechanism(self):
+        parts = [
+            self.draw_arm(),
+            self.draw_disc(),
+        ]
+        return sum(parts, [])
+
     def draw_arm(self):
         base_radius = 0.1
 
@@ -247,10 +254,8 @@ def run_game():
                         canvas.scale_to(pos, (diff/50.))
 
         # Redraw the mechanism
-        arm_drawing = mechanism.draw_arm()
-        disc_drawing = mechanism.draw_disc()
         canvas.clear_canvas()
-        canvas.draw_lines(arm_drawing + disc_drawing)
+        canvas.draw_lines(mechanism.draw_mechanism())
 
         pygame.display.flip()
 
