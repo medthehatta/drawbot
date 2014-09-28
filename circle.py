@@ -160,7 +160,7 @@ class MechanismDrawing(object):
 
         # points that make up a disc with marks 
         # n.b. that the disc center is at the origin of the world
-        pts = [circle(disc_radius)]
+        pts = [circle(disc_radius, resolution=50)]
 
         # 8 radial lines, evenly spaced
         pts += [radial_line(0.9*disc_radius, disc_radius, angle=theta)
