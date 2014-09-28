@@ -155,6 +155,8 @@ class MechanismDrawing(object):
             [ 0.06975647,  0.99756405-1],
             [ 0.04971916,  0.94869806-1],
         ]
+        # scale the points in the head to match the base, and put the head into
+        # the center of the disk
         head_pts = transform(head_pts, 
                     offset=[0, self.arm_length],
                     scale=10*base_radius).tolist()
