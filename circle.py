@@ -180,6 +180,18 @@ def run_game():
                 elif event.key == pygame.K_DOWN:
                     canvas.scale *= 1.1
 
+            elif event.type == pygame.MOUSEMOTION:
+                if event.buttons[1]:
+                    canvas.origin += event.rel
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+
+                if event.button == 3:
+                    print("Canvas: " + str(pos))
+                    print("World:  " + str(canvas.world_coords(pos)))
+
+
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
         canvas.clear_canvas()
