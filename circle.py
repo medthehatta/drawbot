@@ -222,35 +222,29 @@ def run_game():
                     print("Canvas: " + str(pos))
                     print("World:  " + str(canvas.world_coords(pos)))
   
-                elif event.button == 4:
+                elif event.button in [4,5]:
                     pressed = pygame.key.get_pressed()
                     mods = pygame.key.get_mods()
 
                     diff = 5
                     if mods & pygame.KMOD_SHIFT: diff = 10
                     if mods & pygame.KMOD_CTRL: diff = 1
+                    if event.button == 5: diff = -diff 
 
                     if pressed[pygame.K_a]:
                         mechanism.arm_angle += diff
                     if pressed[pygame.K_d]:
                         mechanism.disc_angle += diff
-                    if not pressed[pygame.K_d] and not pressed[pygame.K_a]:
+                    if pressed[pygame.K_l]:
+                        mechanism.arm_length += diff/50.
+                    if pressed[pygame.K_r]:
+                        mechanism.disc_radius += diff/50.
+
+                    if not pressed[pygame.K_d] and \
+                       not pressed[pygame.K_a] and \
+                       not pressed[pygame.K_l] and \
+                       not pressed[pygame.K_r]:
                         canvas.scale_to(pos, (diff/50.))
-
-                elif event.button == 5:
-                    pressed = pygame.key.get_pressed()
-                    mods = pygame.key.get_mods()
-
-                    diff = 5
-                    if mods & pygame.KMOD_SHIFT: diff = 10
-                    if mods & pygame.KMOD_CTRL: diff = 1
-
-                    if pressed[pygame.K_a]:
-                        mechanism.arm_angle -= diff
-                    if pressed[pygame.K_d]:
-                        mechanism.disc_angle -= diff
-                    if not pressed[pygame.K_d] and not pressed[pygame.K_a]:
-                        canvas.scale_to(pos, -(diff/50.))
 
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
