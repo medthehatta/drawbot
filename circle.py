@@ -95,6 +95,13 @@ class Canvas(object):
                 False,
                 lineset)
 
+    def scale_to(pos, scale_chg=0.1):
+        pos_before = self.world_coords(pos)
+        self.scale *= (1 + scale_chg)
+        pos_after = self.world_coords(pos)
+        delta = pos_after - pos_before
+        self.origin += self.canvas_coords(delta, rel=True)
+
 
 
 class MechanismDrawing(object):
@@ -179,14 +186,6 @@ def run_game():
             elif event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     exit_game()
-                elif event.key == pygame.K_LEFT:
-                    mechanism.arm_angle = (mechanism.arm_angle - 5) % 360
-                elif event.key == pygame.K_RIGHT:
-                    mechanism.arm_angle = (mechanism.arm_angle + 5) % 360
-                elif event.key == pygame.K_UP:
-                    canvas.scale *= 0.9
-                elif event.key == pygame.K_DOWN:
-                    canvas.scale *= 1.1
 
             elif event.type == pygame.MOUSEMOTION:
                 if event.buttons[1]:
@@ -198,18 +197,11 @@ def run_game():
                 if event.button == 3:
                     print("Canvas: " + str(pos))
                     print("World:  " + str(canvas.world_coords(pos)))
+
                 elif event.button == 4:
-                    mouse_w_before = canvas.world_coords(pos)
-                    canvas.scale *= 1.1
-                    mouse_w_after = canvas.world_coords(pos)
-                    delta = mouse_w_after - mouse_w_before
-                    canvas.origin += canvas.canvas_coords(delta, rel=True)
+                    canvas.scale_to(pos, 0.1)
                 elif event.button == 5:
-                    mouse_w_before = canvas.world_coords(pos)
-                    canvas.scale *= 0.9
-                    mouse_w_after = canvas.world_coords(pos)
-                    delta = mouse_w_after - mouse_w_before
-                    canvas.origin += canvas.canvas_coords(delta, rel=True)
+                    canvas.scale_to(pos, -0.1)
 
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
