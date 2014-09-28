@@ -43,10 +43,12 @@ def transform(vectors, offset=[0,0], angle=0, scale=1.0):
     else:
         return transformed
 
-def circle(radius, center=[0,0], start=0, end=360, resolution=10):
+def circle(radius, center=[0,0], start=0, end=360, resolution=20):
     pts = [rot2d(th, [[1,0]])[0] for th in np.linspace(start, end, resolution)]
     return transform(pts, offset=center, scale=radius)
 
+def radial_line(r0, r1, center=[0,0], angle=0):
+    return transform([[0,r0], [0,r1]], offset=center, angle=angle)
 
 
 
@@ -106,7 +108,7 @@ class Canvas(object):
 
 class MechanismDrawing(object):
 
-    def __init__(self, disc_radius=1, arm_length=1):
+    def __init__(self, disc_radius=1, arm_length=2):
         # Geometry of the mechanism
         self.disc_radius = disc_radius
         self.arm_length = arm_length
@@ -126,10 +128,10 @@ class MechanismDrawing(object):
         self.arm_angle = 0
 
     def draw_arm(self):
-        base_radius = 0.1*self.arm_length
+        base_radius = 0.1
 
         # points that make up a vertical arm
-        arm_pts = [ \
+        pts = [ \
             # "base"
             circle(base_radius, end=-180),
             # line across base
@@ -138,7 +140,8 @@ class MechanismDrawing(object):
             [[-base_radius,0], [-base_radius,self.arm_length]],
             [[base_radius,0], [base_radius,self.arm_length]],
             # "head"
-            circle(base_radius, end=180, center=[0,self.arm_length])]
+            circle(base_radius, end=180, center=[0,self.arm_length]),
+        ]
 
         # arm angle in world coordinates
         world_arm_angle = \
@@ -148,7 +151,28 @@ class MechanismDrawing(object):
             transform(pts, 
             offset=self.arm_offset,
             angle=world_arm_angle)
-            for pts in arm_pts]
+            for pts in pts]
+
+        return transformed
+
+    def draw_disc(self):
+        disc_radius = self.disc_radius
+
+        # points that make up a disc with marks 
+        # n.b. that the disc center is at the origin of the world
+        pts = [circle(disc_radius)]
+
+        # 8 radial lines, evenly spaced
+        pts += [radial_line(0.9*disc_radius, disc_radius, angle=theta)
+                for theta in np.linspace(0,360,8)]
+
+        # disc angle in world coordinates
+        world_disc_angle = self.disc_angle_direction*self.disc_angle
+        
+        transformed = [\
+            transform(pts, 
+            angle=world_disc_angle)
+            for pts in pts]
 
         return transformed
 
@@ -205,8 +229,9 @@ def run_game():
 
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
+        disc_drawing = mechanism.draw_disc()
         canvas.clear_canvas()
-        canvas.draw_lines(arm_drawing)
+        canvas.draw_lines(arm_drawing + disc_drawing)
 
         pygame.display.flip()
 
