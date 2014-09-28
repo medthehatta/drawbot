@@ -65,7 +65,8 @@ class Canvas(object):
                 np.array([self.rect.get_width(), self.rect.get_height()])/2.
 
     def canvas_coords(self, x):
-        return transform(x*[1,-1], 
+        x = np.array(x)
+        return transform(x*[1,-1],
                 offset=self.origin, 
                 scale=self.pxres*self.scale)
 
