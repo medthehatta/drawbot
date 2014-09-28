@@ -20,10 +20,8 @@ def scale(value, target_scale = 1.0, source_scale = 1.0):
     return target_scale/source_scale * value
 
 def rot2d(angle, vectors, about=[0,0]):
-    """
-    Rotates a vector (or group of vectors) about a point by a given angle (in
-    degrees)
-    """
+    """ Rotates a vector (or group of vectors) about a point by a given angle
+    (in degrees)"""
     vs = np.array(vectors) - about
     angle_rad = np.radians(angle)
     c = np.cos(angle_rad)
@@ -67,6 +65,7 @@ class Canvas(object):
                 np.array([self.rect.get_width(), self.rect.get_height()])/2.
 
     def canvas_coords(self, x, rel=False):
+        """Coordinates on the canvas, given coordinates in the world"""
         x = np.array(x)
         if rel:
             our_offset = 0
@@ -77,6 +76,7 @@ class Canvas(object):
                 scale=self.pxres*self.scale)
 
     def world_coords(self, x, rel=False):
+        """Coordinates in the world, given coordinates on the canvas"""
         x = np.array(x)
         if rel:
             our_offset = 0
@@ -90,6 +90,8 @@ class Canvas(object):
         return self.rect.fill([255]*3)
 
     def draw_lines(self,lines):
+        """For a list consisting of lists of points, draw lines connecting the
+        points in each list.  (Each list is a disjoint image)."""
         for lineset in lines:
             lineset = list(self.canvas_coords(lineset))
             pygame.draw.aalines(self.rect,
@@ -98,6 +100,8 @@ class Canvas(object):
                 lineset)
 
     def scale_to(self, pos=[0,0], scale_chg=0.1):
+        """Scale the canvas, but also ensure that the cursor remains at the
+        same point in world coordinates."""
         pos_before = self.world_coords(pos)
         self.scale *= (1 + scale_chg)
         pos_after = self.world_coords(pos)
@@ -235,10 +239,12 @@ def run():
             if event.type == pygame.QUIT:
                 exit_game()
 
+            # Exit
             elif event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     exit_game()
                 
+            # Pan with middle-click
             elif event.type == pygame.MOUSEMOTION:
                 if event.buttons[1]:
                     canvas.origin += event.rel
@@ -246,10 +252,18 @@ def run():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
 
+                # Print the position of the cursor
                 if event.button == 3:
                     print("Canvas: " + str(pos))
                     print("World:  " + str(canvas.world_coords(pos)))
   
+                # Tune parameters:
+                # a - arm angle
+                # d - disc angle
+                # l - arm length
+                # r - disc radius
+                #
+                # Otherwise, zoom in and out
                 elif event.button in [4,5]:
                     pressed = pygame.key.get_pressed()
                     mods = pygame.key.get_mods()
