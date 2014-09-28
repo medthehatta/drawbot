@@ -97,7 +97,7 @@ class Canvas(object):
                 False,
                 lineset)
 
-    def scale_to(self, pos, scale_chg=0.1):
+    def scale_to(self, pos=[0,0], scale_chg=0.1):
         pos_before = self.world_coords(pos)
         self.scale *= (1 + scale_chg)
         pos_after = self.world_coords(pos)
@@ -211,7 +211,7 @@ class MechanismDrawing(object):
 ###############
 
 
-def run_game():
+def run():
     # Game parameters
     SCREEN_WIDTH, SCREEN_HEIGHT = 800, 800
 
@@ -286,5 +286,5 @@ def exit_game():
     sys.exit()
 
 if __name__ == '__main__':
-    run_game()
+    run()
 
