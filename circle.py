@@ -198,7 +198,18 @@ def run_game():
                 if event.button == 3:
                     print("Canvas: " + str(pos))
                     print("World:  " + str(canvas.world_coords(pos)))
-
+                elif event.button == 4:
+                    mouse_w_before = canvas.world_coords(pos)
+                    canvas.scale *= 1.1
+                    mouse_w_after = canvas.world_coords(pos)
+                    delta = mouse_w_after - mouse_w_before
+                    canvas.origin += canvas.canvas_coords(delta, rel=True)
+                elif event.button == 5:
+                    mouse_w_before = canvas.world_coords(pos)
+                    canvas.scale *= 0.9
+                    mouse_w_after = canvas.world_coords(pos)
+                    delta = mouse_w_after - mouse_w_before
+                    canvas.origin += canvas.canvas_coords(delta, rel=True)
 
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
