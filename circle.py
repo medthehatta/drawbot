@@ -120,8 +120,6 @@ class MechanismDrawing(object):
         self.disc_zero = 0
         # increasing disc angle increases angle in mechanism coords
         self.disc_angle_direction = -1
-        # offset between center of disc and pivot of arm
-        self.arm_offset = [0, -self.arm_length]
 
         # Kinematics of the mechanism
         self.disc_angle = 0
@@ -135,7 +133,28 @@ class MechanismDrawing(object):
         return sum(parts, [])
 
     def draw_arm(self):
-        base_radius = 0.1
+        base_radius = 0.15
+
+        # offset between center of disc and pivot of arm
+        self.arm_offset = [0, -self.arm_length]
+
+        # points in the arm body and head
+        # (converted to local coords from greg's VB code
+        body_pts = [
+            [-0.04971916,  0.94869806],
+            [-0.06975647,  0.99756405],
+            [-0.05390603,  1.02858842],
+            [-0.02722403,  1.03964362],
+            [-0.04361939,  0.99904822],
+            [-0.03046844,  0.96952136],
+            [ 0.        ,  0.96      ],
+            [ 0.03046844,  0.96952136],
+            [ 0.04361939,  0.99904822],
+            [ 0.02722403,  1.03964362],
+            [ 0.05390603,  1.02858842],
+            [ 0.06975647,  0.99756405],
+            [ 0.04971916,  0.94869806],
+        ]
 
         # points that make up a vertical arm
         pts = [ \
@@ -143,11 +162,10 @@ class MechanismDrawing(object):
             circle(base_radius, end=-180),
             # line across base
             [[-base_radius,0], [base_radius,0]],
-            # lines connecting head and base
-            [[-base_radius,0], [-base_radius,self.arm_length]],
-            [[base_radius,0], [base_radius,self.arm_length]],
-            # "head"
-            circle(base_radius, end=180, center=[0,self.arm_length]),
+            # arm head, with body attached
+            [[-base_radius,0]] + \
+            (2*np.array(body_pts)).tolist() + \
+            [[base_radius,0]],
         ]
 
         # arm angle in world coordinates
