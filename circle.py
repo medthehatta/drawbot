@@ -164,7 +164,7 @@ class MechanismDrawing(object):
 
         # 8 radial lines, evenly spaced
         pts += [radial_line(0.9*disc_radius, disc_radius, angle=theta)
-                for theta in np.linspace(0,360,8)]
+                for theta in np.linspace(0,360,12)]
 
         # disc angle in world coordinates
         world_disc_angle = self.disc_angle_direction*self.disc_angle
