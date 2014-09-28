@@ -210,7 +210,7 @@ def run_game():
             elif event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     exit_game()
-
+                
             elif event.type == pygame.MOUSEMOTION:
                 if event.buttons[1]:
                     canvas.origin += event.rel
@@ -221,11 +221,36 @@ def run_game():
                 if event.button == 3:
                     print("Canvas: " + str(pos))
                     print("World:  " + str(canvas.world_coords(pos)))
-
+  
                 elif event.button == 4:
-                    canvas.scale_to(pos, 0.1)
+                    pressed = pygame.key.get_pressed()
+                    mods = pygame.key.get_mods()
+
+                    diff = 1
+                    if mods & pygame.KMOD_SHIFT: diff *= 10
+                    if mods & pygame.KMOD_CTRL: diff *= 5
+
+                    if pressed[pygame.K_a]:
+                        mechanism.arm_angle += diff
+                    elif pressed[pygame.K_d]:
+                        mechanism.disc_angle += diff
+                    else:
+                        canvas.scale_to(pos, 0.1)
+
                 elif event.button == 5:
-                    canvas.scale_to(pos, -0.1)
+                    pressed = pygame.key.get_pressed()
+                    mods = pygame.key.get_mods()
+
+                    diff = 1
+                    if mods & pygame.KMOD_SHIFT: diff *= 10
+                    if mods & pygame.KMOD_CTRL: diff *= 5
+
+                    if pressed[pygame.K_a]:
+                        mechanism.arm_angle -= diff
+                    elif pressed[pygame.K_d]:
+                        mechanism.disc_angle -= diff
+                    else:
+                        canvas.scale_to(pos, -0.1)
 
         # Redraw the mechanism
         arm_drawing = mechanism.draw_arm()
