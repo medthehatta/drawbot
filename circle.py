@@ -64,16 +64,24 @@ class Canvas(object):
         self.origin = \
                 np.array([self.rect.get_width(), self.rect.get_height()])/2.
 
-    def canvas_coords(self, x):
+    def canvas_coords(self, x, rel=False):
         x = np.array(x)
+        if rel:
+            our_offset = 0
+        else:
+            our_offset = self.origin
         return transform(x*[1,-1],
-                offset=self.origin, 
+                offset=our_offset,
                 scale=self.pxres*self.scale)
 
-    def world_coords(self, x):
+    def world_coords(self, x, rel=False):
         x = np.array(x)
+        if rel:
+            our_offset = 0
+        else:
+            our_offset = -self.origin/(self.pxres*self.scale)
         return transform(x,
-                offset=-self.origin/(self.pxres*self.scale),
+                offset=our_offset,
                 scale=1/(self.pxres*self.scale))*[1,-1]
 
     def clear_canvas(self):
