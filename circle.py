@@ -110,12 +110,30 @@ class Canvas(object):
 
 
 
-class MechanismDrawing(object):
-
+class MechanismModel(object):
     def __init__(self, disc_radius=7, arm_length=9):
         # Geometry of the mechanism
         self.disc_radius = disc_radius
         self.arm_length = arm_length
+
+        # Kinematics of the mechanism
+        self.disc_angle = 0
+        self.arm_angle = 0
+
+    def get_disc_radius(self): return self.disc_radius
+    def get_arm_length(self): return self.arm_length
+    def get_disc_angle(self): return self.disc_angle
+    def get_arm_angle(self): return self.arm_angle
+
+
+
+class MechanismDrawing(object):
+
+    def __init__(self, model):
+        # Use the passed-in MechanismModel
+        self.model = model
+
+        # Geometry data only relevant for display
         # arm starts pointing up in the mechanism coords
         self.arm_zero = 0
         # increasing arm angle decreases angle in mechanism coords
@@ -125,10 +143,6 @@ class MechanismDrawing(object):
         # increasing disc angle increases angle in mechanism coords
         self.disc_angle_direction = -1
 
-        # Kinematics of the mechanism
-        self.disc_angle = 0
-        self.arm_angle = 0
-
     def draw_mechanism(self):
         parts = [
             self.draw_arm(),
@@ -137,10 +151,10 @@ class MechanismDrawing(object):
         return sum(parts, [])
 
     def draw_arm(self):
-        base_radius = self.disc_radius/10.
+        base_radius = self.model.get_disc_radius()/10.
 
         # offset between center of disc and pivot of arm
-        arm_offset = [0, -self.arm_length]
+        arm_offset = [0, -self.model.get_arm_length()]
 
         # points in the arm head
         # (converted to local coords from greg's VB code
@@ -162,7 +176,7 @@ class MechanismDrawing(object):
         # scale the points in the head to match the base, and put the head into
         # the center of the disk
         head_pts = transform(head_pts, 
-                    offset=[0, self.arm_length],
+                    offset=[0, self.model.get_arm_length()],
                     scale=10*base_radius).tolist()
 
         # points that make up a vertical arm
@@ -177,8 +191,8 @@ class MechanismDrawing(object):
 
         # arm angle in world coordinates
         world_arm_angle = \
-            self.arm_zero + self.arm_angle_direction*self.arm_angle
-        
+            self.arm_zero + self.arm_angle_direction*self.model.get_arm_angle()
+ 
         transformed = [
             transform(pts, 
             offset=arm_offset,
@@ -188,7 +202,7 @@ class MechanismDrawing(object):
         return transformed
 
     def draw_disc(self):
-        disc_radius = self.disc_radius
+        disc_radius = self.model.get_disc_radius()
 
         # points that make up a disc with marks 
         # n.b. that the disc center is at the origin of the world
@@ -199,7 +213,7 @@ class MechanismDrawing(object):
                 for theta in np.linspace(0,360,12)]
 
         # disc angle in world coordinates
-        world_disc_angle = self.disc_angle_direction*self.disc_angle
+        world_disc_angle = self.disc_angle_direction*self.model.get_disc_angle()
         
         transformed = [
             transform(pts, 
@@ -225,7 +239,8 @@ def run():
     clock = pygame.time.Clock()
 
     # Instantiate a mechanism drawing
-    mechanism = MechanismDrawing()
+    model = MechanismModel()
+    mechanism = MechanismDrawing(model)
     canvas = Canvas(screen)
 
     # The main game loop
@@ -274,13 +289,13 @@ def run():
                     if event.button == 5: diff = -diff 
 
                     if pressed[pygame.K_a]:
-                        mechanism.arm_angle += diff
+                        model.arm_angle += diff
                     if pressed[pygame.K_d]:
-                        mechanism.disc_angle += diff
+                        model.disc_angle += diff
                     if pressed[pygame.K_l]:
-                        mechanism.arm_length += diff/50.
+                        model.arm_length += diff/50.
                     if pressed[pygame.K_r]:
-                        mechanism.disc_radius += diff/50.
+                        model.disc_radius += diff/50.
 
                     if not pressed[pygame.K_d] and \
                        not pressed[pygame.K_a] and \
