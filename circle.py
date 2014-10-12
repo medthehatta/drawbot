@@ -55,17 +55,14 @@ def radial_line(r0, r1, center=[0,0], angle=0):
 # CLASSES #
 ###########
 
-class Canvas(object):
-    
-    def __init__(self, rect, scale=1.0, pxres=72):
-        self.rect = rect
+class CoordinateSystem(object):
+    def __init__(self, scale=1.0, origin=[0,0], angle=0.0):
         self.scale = scale
-        self.pxres = pxres
-        self.origin = \
-                np.array([self.rect.get_width(), self.rect.get_height()])/2.
+        self.origin = np.array(origin)
+        self.angle = angle
 
-    def canvas_coords(self, x, rel=False):
-        """Coordinates on the canvas, given coordinates in the world"""
+    def to_coords(self, x, rel=False):
+        """Coordinates of the system in world coordinates"""
         x = np.array(x)
         if rel:
             our_offset = 0
@@ -75,8 +72,8 @@ class Canvas(object):
                 offset=our_offset,
                 scale=self.pxres*self.scale)
 
-    def world_coords(self, x, rel=False):
-        """Coordinates in the world, given coordinates on the canvas"""
+    def from_coords(self, x, rel=False):
+        """Coordinates of the world in system coords"""
         x = np.array(x)
         if rel:
             our_offset = 0
@@ -85,6 +82,27 @@ class Canvas(object):
         return transform(x,
                 offset=our_offset,
                 scale=1/(self.pxres*self.scale))*[1,-1]
+
+
+
+class Canvas(CoordinateSystem):
+    def __init__(self, rect, scale=1.0, pxres=72):
+        self.rect = rect
+        self.pxres = pxres
+        self.real_scale=scale
+        super().__init__(
+            scale=self.pxres*self.real_scale, 
+            origin=[self.rect.get_width()/2., self.rect.get_height()/2.],
+            angle=0.0,
+        )
+
+    def canvas_coords(self, x, rel=False):
+        """Coordinates on the canvas, given coordinates in the world"""
+        return self.to_coords(x,rel)
+
+    def world_coords(self, x, rel=False):
+        """Coordinates in the world, given coordinates on the canvas"""
+        return self.from_coords(x,rel)
 
     def clear_canvas(self):
         return self.rect.fill([255]*3)
