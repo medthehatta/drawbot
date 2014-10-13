@@ -86,14 +86,21 @@ class CoordinateSystem(object):
 
 
 class Canvas(CoordinateSystem):
-    def __init__(self, rect, scale=1.0, pxres=72):
+    def __init__(self, rect, scale=1.0, pxres=72, parent=None):
         self.rect = rect
+        self.parent = parent
+        self.children = []
         self.pxres = pxres
         self.real_scale=scale
         super().__init__(
             origin=[self.rect.get_width()/2., self.rect.get_height()/2.],
         )
         self.set_scale(scale)
+
+    def parent_to(self, parent):
+        self.parent = parent
+        self.parent.children.append(self)
+        return self
 
     def set_scale(self, scale=1.0):
         self.real_scale = scale
@@ -127,6 +134,11 @@ class Canvas(CoordinateSystem):
             pygame.draw.aalines(self.rect, [0]*3, False, lineset)
         return self
 
+    def draw_points(self,pts):
+        for pt in pts:
+            pt = self.canvas_coords(pt)
+            pygame.draw.circle(self.rect, [0]*3, pt, radius=1)
+        return self
 
     def scale_to(self, pos=[0,0], scale_chg=0.1):
         """Scale the canvas, but also ensure that the cursor remains at the
@@ -141,7 +153,7 @@ class Canvas(CoordinateSystem):
 
 
 class MechanismModel(object):
-    def __init__(self, disc_radius=7, arm_length=9):
+    def __init__(self, disc_radius=5, arm_length=7):
         # Geometry of the mechanism
         self.disc_radius = disc_radius
         self.arm_length = arm_length
