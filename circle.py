@@ -70,7 +70,7 @@ class CoordinateSystem(object):
             our_offset = self.origin
         return transform(x*[1,-1],
                 offset=our_offset,
-                scale=self.pxres*self.scale)
+                scale=self.scale)
 
     def from_coords(self, x, rel=False):
         """Coordinates of the world in system coords"""
@@ -81,7 +81,7 @@ class CoordinateSystem(object):
             our_offset = -self.origin/(self.pxres*self.scale)
         return transform(x,
                 offset=our_offset,
-                scale=1/(self.pxres*self.scale))*[1,-1]
+                scale=1/self.scale)*[1,-1]
 
 
 
@@ -91,10 +91,22 @@ class Canvas(CoordinateSystem):
         self.pxres = pxres
         self.real_scale=scale
         super().__init__(
-            scale=self.pxres*self.real_scale, 
             origin=[self.rect.get_width()/2., self.rect.get_height()/2.],
-            angle=0.0,
         )
+        self.set_scale(scale)
+
+    def set_scale(self, scale=1.0):
+        self.real_scale = scale
+        self.scale = self.pxres*self.real_scale
+        return self
+
+    def stretch(self, factor=1.0):
+        return self.set_scale(self.real_scale*factor)
+
+    def center_to_rect(self):
+        origin = [self.rect.get_width()/2., self.rect.get_height()/2.]
+        self.origin = np.array(origin)
+        return self
 
     def canvas_coords(self, x, rel=False):
         """Coordinates on the canvas, given coordinates in the world"""
@@ -112,19 +124,19 @@ class Canvas(CoordinateSystem):
         points in each list.  (Each list is a disjoint image)."""
         for lineset in lines:
             lineset = list(self.canvas_coords(lineset))
-            pygame.draw.aalines(self.rect,
-                [0]*3,
-                False,
-                lineset)
+            pygame.draw.aalines(self.rect, [0]*3, False, lineset)
+        return self
+
 
     def scale_to(self, pos=[0,0], scale_chg=0.1):
         """Scale the canvas, but also ensure that the cursor remains at the
         same point in world coordinates."""
         pos_before = self.world_coords(pos)
-        self.scale *= (1 + scale_chg)
+        self.stretch(1 + scale_chg)
         pos_after = self.world_coords(pos)
         delta = pos_after - pos_before
-        self.origin += self.canvas_coords(delta, rel=True)
+        self.origin += self.canvas_coords(delta, rel=True)/self.pxres
+        return self
 
 
 
@@ -146,7 +158,6 @@ class MechanismModel(object):
 
 
 class MechanismDrawing(object):
-
     def __init__(self, model):
         # Use the passed-in MechanismModel
         self.model = model
@@ -193,9 +204,11 @@ class MechanismDrawing(object):
         ]
         # scale the points in the head to match the base, and put the head into
         # the center of the disk
-        head_pts = transform(head_pts, 
-                    offset=[0, self.model.get_arm_length()],
-                    scale=10*base_radius).tolist()
+        head_pts = transform(
+            head_pts, 
+            offset=[0, self.model.get_arm_length()],
+            scale=10*base_radius
+        ).tolist()
 
         # points that make up a vertical arm
         pts = [ 
@@ -212,10 +225,9 @@ class MechanismDrawing(object):
             self.arm_zero + self.arm_angle_direction*self.model.get_arm_angle()
  
         transformed = [
-            transform(pts, 
-            offset=arm_offset,
-            angle=world_arm_angle)
-            for pts in pts]
+            transform(pts, offset=arm_offset, angle=world_arm_angle)
+            for pts in pts
+        ]
 
         return transformed
 
@@ -227,16 +239,18 @@ class MechanismDrawing(object):
         pts = [circle(disc_radius, resolution=50)]
 
         # 8 radial lines, evenly spaced
-        pts += [radial_line(0.9*disc_radius, disc_radius, angle=theta)
-                for theta in np.linspace(0,360,12)]
+        pts += [
+            radial_line(0.9*disc_radius, disc_radius, angle=theta)
+            for theta in np.linspace(0,360,12)
+        ]
 
         # disc angle in world coordinates
         world_disc_angle = self.disc_angle_direction*self.model.get_disc_angle()
         
         transformed = [
-            transform(pts, 
-            angle=world_disc_angle)
-            for pts in pts]
+            transform(pts, angle=world_disc_angle)
+            for pts in pts
+        ]
 
         return transformed
 
@@ -272,31 +286,38 @@ def run():
             if event.type == pygame.QUIT:
                 exit_game()
 
-            # Exit
+            # Keypresses
             elif event.type == pygame.KEYDOWN:
+
+                # Exit
                 if event.key in [pygame.K_ESCAPE, pygame.K_q]:
                     exit_game()
-                
+
+                # Recenter
+                elif event.key == pygame.K_c:
+                    print("centering")
+                    canvas.set_scale(1.0)
+                    canvas.center_to_rect()
+ 
             # Pan with middle-click
             elif event.type == pygame.MOUSEMOTION:
                 if event.buttons[1]:
                     canvas.origin += event.rel
 
+            # Other button clicks
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
 
-                # Print the position of the cursor
+                # Print the position of the cursor with right click
                 if event.button == 3:
                     print("Canvas: " + str(pos))
                     print("World:  " + str(canvas.world_coords(pos)))
   
-                # Tune parameters:
+                # Tune parameters with mousewheel and holding down key:
                 # a - arm angle
                 # d - disc angle
                 # l - arm length
                 # r - disc radius
-                #
-                # Otherwise, zoom in and out
                 elif event.button in [4,5]:
                     pressed = pygame.key.get_pressed()
                     mods = pygame.key.get_mods()
@@ -315,6 +336,7 @@ def run():
                     if pressed[pygame.K_r]:
                         model.disc_radius += diff/50.
 
+                    # Otherwise, zoom in and out
                     if not pressed[pygame.K_d] and \
                        not pressed[pygame.K_a] and \
                        not pressed[pygame.K_l] and \
