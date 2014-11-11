@@ -1,4 +1,6 @@
 import geometry
+import pygame
+
 from numpy import array
 
 class Canvas(geometry.CoordinateSystem):

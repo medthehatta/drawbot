@@ -1,4 +1,5 @@
 import numpy as np
+from geometry import transform, scale, radial_line, circle
 
 class MechanismModel(object):
     def __init__(self, disc_radius=5, arm_length=7):

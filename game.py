@@ -17,7 +17,7 @@ from utilities import ziplist
 
 def run():
     # Game parameters
-    SCREEN_WIDTH, SCREEN_HEIGHT = 800, 800
+    SCREEN_WIDTH, SCREEN_HEIGHT = 600, 600
 
     pygame.init()
     screen = pygame.display.set_mode(
@@ -26,8 +26,8 @@ def run():
 
     # Instantiate a mechanism drawing
     model = mechanism.MechanismModel()
-    mechanism = mechanism.MechanismDrawing(model)
-    canvas = drawing.Canvas(screen)
+    mech = mechanism.MechanismDrawing(model)
+    canvas = drawing.Canvas(screen, scale=0.7)
 
     # The main game loop
     #
@@ -99,7 +99,7 @@ def run():
 
         # Redraw the mechanism
         canvas.clear_canvas()
-        canvas.draw_lines(mechanism.draw_mechanism())
+        canvas.draw_lines(mech.draw_mechanism())
 
         pygame.display.flip()
 
