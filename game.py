@@ -50,13 +50,17 @@ def run():
                 # Recenter
                 elif event.key == pygame.K_c:
                     print("centering")
-                    canvas.scale = 1.0
-                    canvas.center_to_rect()
+                    canvas.coords.scale = 1.0
+
+                # Coords
+                elif event.key == pygame.K_v:
+                    print("placing coords")
+                    canvas.draw_points([[0,0]])
  
             # Pan with middle-click
             elif event.type == pygame.MOUSEMOTION:
                 if event.buttons[1]:
-                    canvas.origin += event.rel
+                    canvas.coords.origin += event.rel
 
             # Other button clicks
             elif event.type == pygame.MOUSEBUTTONDOWN:

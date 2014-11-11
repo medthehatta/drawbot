@@ -64,7 +64,7 @@ def test_stacked_coords(stacked_coords):
 
 @pytest.fixture
 def canvas():
-    c_rect = pygame.Rect(0,0,100,100)
+    c_rect = pygame.Surface((100,100))
     return drawing.Canvas(c_rect,pxres=72)
 
 def test_canvas(canvas):
@@ -75,8 +75,8 @@ def test_canvas(canvas):
 
 @pytest.fixture
 def stacked_canvases():
-    c_rect = pygame.Rect(0,0,100,100)
-    d_rect = pygame.Rect(0,0,100,100)
+    c_rect = pygame.Surface((100,100))
+    d_rect = pygame.Surface((100,100))
     c = drawing.Canvas(c_rect,pxres=72)
     d = drawing.Canvas(d_rect,pxres=72,parent=c)
     return (c,d)
@@ -89,6 +89,7 @@ def test_stacked_canvases(stacked_canvases):
     assert near(d.world_coords([1,0],rel=True), np.array([50,-22]))
     print('Doing nested test')
     d.coords.angle = 90
-    vec = d.world_coords([0,1],rel=True)
+    vec = d.world_coords([0,1])
     assert near(vec, np.array([50,122]))
+
 

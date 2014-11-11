@@ -62,14 +62,14 @@ class CoordinateSystem(object):
         if self.parent is None:
             return self._to_coords(x, rel)
         else:
-            return self.parent.to_coords(self._to_coords(x,rel))
+            return self.parent.to_coords(self._to_coords(x,rel),rel)
 
     def from_coords(self, x, rel=False):
         """Coordinates of the world in system coordinates"""
         if self.parent is None:
             return self._from_coords(x, rel)
         else:
-            return self.from_coords(self.parent._from_coords(x,rel))
+            return self.from_coords(self.parent._from_coords(x,rel),rel)
 
     def _to_coords(self, x, rel=False):
         x = np.array(x)

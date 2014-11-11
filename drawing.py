@@ -12,19 +12,19 @@ class Canvas(object):
         self.coords.__init__(scale,origin,angle,parent_coords)
         self.rect = rect
         self.pxres = pxres
-        self.origin = [self.rect.width/2., self.rect.height/2.]
+        self.origin = [self.rect.get_width()/2., self.rect.get_height()/2.]
 
     def get_coords(self):
         return self.coords
 
     def canvas_coords(self, x, rel=False):
         """Coordinates on the canvas, given coordinates in the world"""
-        trans = (x - self.origin)*[1,-1]/self.pxres
+        trans = (array(x) - self.origin)*[1,-1]/self.pxres
         return self.get_coords().from_coords(trans, rel)
 
     def world_coords(self, x, rel=False):
         """Coordinates in the world, given coordinates on the canvas"""
-        trans = self.get_coords().to_coords(x,rel)
+        trans = array(self.get_coords().to_coords(x,rel))
         return trans*[1,-1]*self.pxres + self.origin
 
     def clear_canvas(self):
