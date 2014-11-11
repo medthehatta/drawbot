@@ -50,7 +50,7 @@ def run():
                 # Recenter
                 elif event.key == pygame.K_c:
                     print("centering")
-                    canvas.set_scale(1.0)
+                    canvas.scale = 1.0
                     canvas.center_to_rect()
  
             # Pan with middle-click

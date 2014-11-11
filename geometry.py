@@ -51,9 +51,12 @@ class CoordinateSystem(object):
             our_offset = 0
         else:
             our_offset = self.origin
-        return transform(x*[1,-1],
-                offset=our_offset,
-                scale=self.scale)
+        return transform(
+            x,
+            offset=our_offset,
+            scale=self.scale,
+            angle=self.angle,
+        )
 
     def from_coords(self, x, rel=False):
         """Coordinates of the world in system coords"""
@@ -61,8 +64,11 @@ class CoordinateSystem(object):
         if rel:
             our_offset = 0
         else:
-            our_offset = -self.origin/(self.pxres*self.scale)
-        return transform(x,
-                offset=our_offset,
-                scale=1/self.scale)*[1,-1]
+            our_offset = -self.origin/self.scale
+        return transform(
+            x,
+            offset=our_offset,
+            angle=-self.angle,
+            scale=1/self.scale,
+        )
 
