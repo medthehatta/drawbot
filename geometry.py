@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 def scale(value, target_scale = 1.0, source_scale = 1.0):
     return target_scale/source_scale * value
@@ -39,13 +40,38 @@ def radial_line(r0, r1, center=[0,0], angle=0):
 ###########
 
 class CoordinateSystem(object):
-    def __init__(self, scale=1.0, origin=[0,0], angle=0.0):
+    def __init__(self, scale=1.0, origin=[0,0], angle=0.0, parent=None):
         self.scale = scale
         self.origin = np.array(origin)
         self.angle = angle
+        self.children = []
+        self.parent = None
+        if parent: self.parent_to(parent)
+
+    def parent_to(self, parent):
+        if self.parent is not None:
+            self.parent.remove(self)
+        self.parent = parent
+        self.parent.add_children(self)
+
+    def add_children(self, *children):
+        self.children += children
 
     def to_coords(self, x, rel=False):
         """Coordinates of the system in world coordinates"""
+        if self.parent is None:
+            return self._to_coords(x, rel)
+        else:
+            return self.parent.to_coords(self._to_coords(x,rel))
+
+    def from_coords(self, x, rel=False):
+        """Coordinates of the world in system coordinates"""
+        if self.parent is None:
+            return self._from_coords(x, rel)
+        else:
+            return self.from_coords(self.parent._from_coords(x,rel))
+
+    def _to_coords(self, x, rel=False):
         x = np.array(x)
         if rel:
             our_offset = 0
@@ -58,7 +84,7 @@ class CoordinateSystem(object):
             angle=self.angle,
         )
 
-    def from_coords(self, x, rel=False):
+    def _from_coords(self, x, rel=False):
         """Coordinates of the world in system coords"""
         x = np.array(x)
         if rel:
